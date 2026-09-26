@@ -1,0 +1,68 @@
+CREATE TABLE military_asset_management.expenditures (
+    id BIGSERIAL PRIMARY KEY,
+    base_id BIGINT NOT NULL REFERENCES military_asset_management.bases(id),
+    equipment_id BIGINT NOT NULL REFERENCES military_asset_management.equipment(id),
+    quantity INTEGER NOT NULL,
+    reason VARCHAR(255),
+    expended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    recorded_by BIGINT REFERENCES military_asset_management.users(id)
+);
+
+CREATE TABLE military_asset_management.assignments (
+    id BIGSERIAL PRIMARY KEY,
+    base_id BIGINT NOT NULL REFERENCES military_asset_management.bases(id),
+    equipment_id BIGINT NOT NULL REFERENCES military_asset_management.equipment(id),
+    personnel_name VARCHAR(150) NOT NULL,
+    quantity INTEGER NOT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assigned_by BIGINT REFERENCES military_asset_management.users(id)
+);
+
+
+CREATE TABLE military_asset_management.transfer_items (
+    id BIGSERIAL PRIMARY KEY,
+    transfer_id BIGINT NOT NULL REFERENCES military_asset_management.transfers(id),
+    equipment_id BIGINT NOT NULL REFERENCES military_asset_management.equipment(id),
+    quantity INTEGER NOT NULL CHECK (quantity > 0)
+);
+
+CREATE TABLE military_asset_management.transfers (
+    id BIGSERIAL PRIMARY KEY,
+    from_base_id BIGINT NOT NULL REFERENCES military_asset_management.bases(id),
+    to_base_id BIGINT NOT NULL REFERENCES military_asset_management.bases(id),
+    transfer_date TIMESTAMP NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    reference_number VARCHAR(100),
+    created_by BIGINT REFERENCES military_asset_management.users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE military_asset_management.purchases (
+    id BIGSERIAL PRIMARY KEY,
+    base_id BIGINT NOT NULL REFERENCES military_asset_management.bases(id),
+    equipment_id BIGINT NOT NULL REFERENCES military_asset_management.equipment(id),
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    purchase_date DATE NOT NULL,
+    supplier VARCHAR(200),
+    reference_number VARCHAR(100),
+    created_by BIGINT REFERENCES military_asset_management.users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE military_asset_management.users (
+id BIGSERIAL PRIMARY KEY,
+username VARCHAR(100) UNIQUE NOT NULL,
+password VARCHAR(255) NOT NULL,
+role VARCHAR(50) NOT NULL,
+base_id BIGINT REFERENCES military_asset_management.bases(id),
+active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE military_asset_management.equipment (
+id BIGSERIAL PRIMARY KEY,
+name VARCHAR(150) NOT NULL,
+equipment_type VARCHAR(50) NOT NULL,
+description TEXT,
+unit VARCHAR(30),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
